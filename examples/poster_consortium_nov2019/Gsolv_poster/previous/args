@@ -1,0 +1,1 @@
+--data_path data/solvation/MNSol_compsol_cleaned_averaged.csv --dataset_type regression --save_dir examples/Gsolv_poster/previous --batch_size 50 --hidden_size 100 --depth 7 --dropout 0.1 --epochs 100 --solvation --detailed_results --ffn_num_layers 3 --num_folds 3

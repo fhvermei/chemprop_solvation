@@ -1,0 +1,29 @@
+Fold 0
+Model 0 best validation rmse = 20.145411 on epoch 28
+Model 0 test rmse = 9.111820
+Ensemble test rmse = 9.111820
+1-fold cross validation
+Seed 0 ==> test rmse = 9.111820
+Overall test rmse = 9.111820 +/- 0.000000
+Fold 0
+Model 0 best validation rmse = 23.289753 on epoch 7
+Model 0 test rmse = 18.984976
+Model 0 test Hform rmse = 18.984976
+Ensemble test rmse = 18.984976
+Ensemble test Hform rmse = 18.984976
+1-fold cross validation
+Seed 0 ==> test rmse = 18.984976
+Seed 0 ==> test Hform rmse = 18.984976
+Overall test rmse = 18.984976 +/- 0.000000
+Overall test Hform rmse = 18.984976 +/- 0.000000
+Fold 0
+Model 0 best validation rmse = 21.453076 on epoch 29
+Model 0 test rmse = 10.918457
+Model 0 test Hform rmse = 10.918457
+Ensemble test rmse = 10.918457
+Ensemble test Hform rmse = 10.918457
+1-fold cross validation
+Seed 0 ==> test rmse = 10.918457
+Seed 0 ==> test Hform rmse = 10.918457
+Overall test rmse = 10.918457 +/- 0.000000
+Overall test Hform rmse = 10.918457 +/- 0.000000
