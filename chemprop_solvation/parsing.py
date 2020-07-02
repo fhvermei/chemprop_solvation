@@ -166,8 +166,10 @@ def add_train_args(parser: ArgumentParser):
                         help='Number of models in ensemble')
     parser.add_argument('--hidden_size', type=int, default=200,
                         help='Dimensionality of hidden layers in MPN')
-    parser.add_argument('--bias', action='store_true', default=False,
+    parser.add_argument('--bias', action='store_true', default=True,
                         help='Whether to add bias to linear layers')
+    parser.add_argument('--bias_ffn', action='store_true', default=True,
+                        help='Whether to add bias to linear layers of the ffn')
     parser.add_argument('--depth', type=int, default=3,
                         help='Number of message passing steps')
     parser.add_argument('--dropout', type=float, default=0.1,
@@ -179,7 +181,7 @@ def add_train_args(parser: ArgumentParser):
                         help='Undirected edges (always sum the two relevant bond vectors)')                     
     parser.add_argument('--ffn_hidden_size', type=int, default=None,
                         help='Hidden dim for higher-capacity FFN (defaults to hidden_size)')
-    parser.add_argument('--ffn_num_layers', type=int, default=3,
+    parser.add_argument('--ffn_num_layers', type=int, default=4,
                         help='Number of layers in FFN after MPN encoding')
     parser.add_argument('--atom_messages', action='store_true', default=False,
                         help='Use messages on atoms instead of messages on bonds')
