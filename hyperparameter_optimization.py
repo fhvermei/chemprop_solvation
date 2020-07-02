@@ -17,10 +17,12 @@ from chemprop_solvation.utils import create_logger, makedirs
 
 
 SPACE = {
-    'hidden_size': hp.quniform('hidden_size', low=100, high=1000, q=100),
-    'depth': hp.quniform('depth', low=4, high=8, q=1),
+    'hidden_size': hp.quniform('hidden_size', low=100, high=500, q=100),
+    'depth': hp.quniform('depth', low=3, high=5, q=1),
     'dropout': hp.quniform('dropout', low=0.0, high=0.3, q=0.05),
-    'ffn_num_layers': hp.quniform('ffn_num_layers', low=2, high=5, q=1)
+    'ffn_num_layers': hp.quniform('ffn_num_layers', low=2, high=5, q=1),
+    'ffn_hidden_size': hp.quniform('ffn_num_layers', low=400, high=1000, q=200),
+    'warmup_epochs': hp.quniform('ffn_num_layers', low=2, high=6, q=2)
 }
 INT_KEYS = ['hidden_size', 'depth', 'ffn_num_layers']
 
@@ -95,7 +97,7 @@ def grid_search(args: Namespace):
 if __name__ == '__main__':
     parser = ArgumentParser()
     add_train_args(parser)
-    parser.add_argument('--num_iters', type=int, default=20,
+    parser.add_argument('--num_iters', type=int, default=50,
                         help='Number of hyperparameter choices to try')
     parser.add_argument('--config_save_path', type=str, required=True,
                         help='Path to .json file where best hyperparameter settings will be written')
