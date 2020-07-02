@@ -6,7 +6,7 @@ import torch
 
 # Atom feature sizes
 
-MAX_ATOMIC_NUM = 18
+MAX_ATOMIC_NUM = 54
 ATOM_FEATURES = {
     'atomic_num': list(range(MAX_ATOMIC_NUM)),
     'degree': [0, 1, 2, 3, 4, 5],
