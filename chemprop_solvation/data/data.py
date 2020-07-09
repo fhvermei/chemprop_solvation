@@ -127,7 +127,6 @@ class MoleculeDatapoint:
         self.targets = targets
 
 
-
 class MoleculeDataset(Dataset):
     """A MoleculeDataset contains a list of molecules and their associated features and targets."""
 
@@ -140,7 +139,10 @@ class MoleculeDataset(Dataset):
         self.data = data
         self.args = self.data[0].args if len(self.data) > 0 else None
         self.scaler = None
-        self.solvation = self.args.solvation
+        if self.args:
+            self.solvation = self.args.solvation
+        else:
+            self.solvation = None
 
     def compound_names(self) -> List[str]:
         """
