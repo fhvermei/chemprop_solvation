@@ -1,4 +1,0 @@
---data_path data/Hfus/Hfus_cleaned_rarecomp.csv --dataset_type regression --features_path data/Hfus/symm_Hfus.csv --save_dir examples/Hfus_poster/smallermodel --batch_size 20 --hidden_size 50 --depth 2 --dropout 0.1 --epochs 300 --Tmelt --detailed_results --ffn_num_layers 3 --num_folds 5 --final_lr 1e-5 --init_lr 1e-3 --max_lr 1e-2
-
-Use fold0, fold2 and fold4 for results in poster
-
