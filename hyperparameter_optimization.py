@@ -24,11 +24,12 @@ SPACE = {
     'ffn_hidden_size': hp.quniform('ffn_hidden_size', low=400, high=1000, q=200),
     'warmup_epochs': hp.quniform('warmup_epochs', low=2, high=6, q=2),
     'batch_size': hp.quniform('batch_size', low=10, high=100, q=10),
+    'epochs': hp.quniform('epochs', low=20, high=300, q=50),
     'init_lr': hp.loguniform('init_lr', low=-11, high=-5),
     'max_lr': hp.loguniform('max_lr', low=-11, high=-5),
     'final_lr': hp.loguniform('final_lr', low=-14, high=-7)
 }
-INT_KEYS = ['hidden_size', 'depth', 'ffn_num_layers', 'ffn_hidden_size', 'warmup_epochs', 'batch_size']
+INT_KEYS = ['hidden_size', 'depth', 'ffn_num_layers', 'epochs', 'ffn_hidden_size', 'warmup_epochs', 'batch_size']
 
 
 def grid_search(args: Namespace):
