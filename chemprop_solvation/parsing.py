@@ -166,7 +166,7 @@ def add_train_args(parser: ArgumentParser):
                         help='Number of models in ensemble')
     parser.add_argument('--hidden_size', type=int, default=200,
                         help='Dimensionality of hidden layers in MPN')
-    parser.add_argument('--bias', action='store_true', default=True,
+    parser.add_argument('--bias', action='store_true', default=False,
                         help='Whether to add bias to linear layers')
     parser.add_argument('--bias_ffn', action='store_true', default=True,
                         help='Whether to add bias to linear layers of the ffn')
