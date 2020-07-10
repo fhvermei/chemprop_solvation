@@ -4,7 +4,6 @@ import torch.nn as nn
 
 from .mpn import MPN
 from .mpn import MPN_solvation
-from .mpn import MPN_solvation_attention
 
 from chemprop_solvation.nn_utils import get_activation_function, initialize_weights
 
@@ -44,8 +43,6 @@ class MoleculeModel(nn.Module):
         """
         self.encoder = MPN_solvation(args)
 
-        #self.encoder = MPN_solvation_attention(args)
-
     def create_ffn(self, args: Namespace):
         """
         Creates the feed-forward network for the model.
@@ -64,7 +61,6 @@ class MoleculeModel(nn.Module):
             if args.use_input_features:
                 first_linear_dim += args.features_dim
             if self.solvation:
-                #first_linear_dim += args.hidden_size*3    #attention layer is combination of 2 atoms with each hidden size
                 first_linear_dim += args.hidden_size
             if args.Tmelt:
                 first_linear_dim+=2
