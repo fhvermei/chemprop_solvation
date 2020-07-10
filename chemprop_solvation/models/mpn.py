@@ -130,11 +130,13 @@ class MPNEncoder(nn.Module):
         atom_hiddens = self.act_func(self.W_o(a_input))  # num_atoms x hidden
         atom_hiddens = self.dropout_layer(atom_hiddens)  # num_atoms x hidden
 
-        tpsa = []
-        molr = []
+        tpsa, molr = [], []
         for mol in mol_graph.getsmiles():
-            tpsa.append(AllChem.CalcTPSA(Chem.MolFromSmiles(mol)) / 100.0)
-            molr.append(Crippen.MolMR(Chem.MolFromSmiles(mol)) / 100.0)
+            tpsa.append([AllChem.CalcTPSA(Chem.MolFromSmiles(mol)) / 100.0])
+            molr.append([Crippen.MolMR(Chem.MolFromSmiles(mol)) / 100.0])
+        tpsa, molr = torch.FloatTensor(tpsa), torch.FloatTensor(molr)
+        if self.args.cuda or next(self.parameters()).is_cuda:
+            tpsa, molr = tpsa.cuda(), molr.cuda()
 
         if self.args.Tmelt:
             sssr = list()
@@ -158,8 +160,8 @@ class MPNEncoder(nn.Module):
                 mol_vec = cur_hiddens  # (num_atoms, hidden_size)
                 mol_vec = mol_vec.sum(dim=0) / a_size
                 #mol_vec = mol_vec.sum(dim=0)
-                mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(tpsa[i])])])
-                mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(molr[i])])])
+                #mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(tpsa[i])])])
+                #mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(molr[i])])])
 
                 if self.args.Tmelt:
                     #mol_vec.add(symm[i])
@@ -169,7 +171,9 @@ class MPNEncoder(nn.Module):
                 mol_vecs.append(mol_vec)
 
         mol_vecs = torch.stack(mol_vecs, dim=0)  # (num_molecules, hidden_size)
-        
+        mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
+        mol_vecs = torch.cat([mol_vecs, molr], dim=1)
+
         if self.use_input_features:
             features_batch = features_batch.to(mol_vecs)
             if len(features_batch.shape) == 1:
