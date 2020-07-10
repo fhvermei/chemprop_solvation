@@ -9,6 +9,8 @@ from chemprop_solvation.features import BatchMolGraph, get_atom_fdim, get_bond_f
 from chemprop_solvation.features.featurization import mol2graph_solvation
 from chemprop_solvation.nn_utils import index_select_ND, get_activation_function
 from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Crippen
 #from rmgpy.molecule import Molecule
 #import quantities
 #import cython
@@ -128,6 +130,12 @@ class MPNEncoder(nn.Module):
         atom_hiddens = self.act_func(self.W_o(a_input))  # num_atoms x hidden
         atom_hiddens = self.dropout_layer(atom_hiddens)  # num_atoms x hidden
 
+        tpsa = []
+        molr = []
+        for mol in mol_graph.getsmiles():
+            tpsa.append(AllChem.CalcTPSA(Chem.MolFromSmiles(mol)) / 100.0)
+            molr.append(Crippen.MolMR(Chem.MolFromSmiles(mol)) / 100.0)
+
         if self.args.Tmelt:
             sssr = list()
             flatness = list()
@@ -150,6 +158,9 @@ class MPNEncoder(nn.Module):
                 mol_vec = cur_hiddens  # (num_atoms, hidden_size)
                 mol_vec = mol_vec.sum(dim=0) / a_size
                 #mol_vec = mol_vec.sum(dim=0)
+                mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(tpsa[i])])])
+                mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(molr[i])])])
+
                 if self.args.Tmelt:
                     #mol_vec.add(symm[i])
                     ring = float(sssr[i])
