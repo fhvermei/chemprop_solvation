@@ -160,8 +160,8 @@ class MPNEncoder(nn.Module):
                 mol_vec = cur_hiddens  # (num_atoms, hidden_size)
                 mol_vec = mol_vec.sum(dim=0) / a_size
                 #mol_vec = mol_vec.sum(dim=0)
-                #mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(tpsa[i])])])
-                #mol_vec = torch.cat([mol_vec, torch.FloatTensor([float(molr[i])])])
+                # change this manually if you want to sum over atom vectors instead of averaging
+
 
                 if self.args.Tmelt:
                     #mol_vec.add(symm[i])
