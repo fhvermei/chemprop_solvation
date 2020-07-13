@@ -145,13 +145,11 @@ class MPNEncoder(nn.Module):
             peoe.append([i/100.0 for i in AllChem.PEOE_VSA_(mol)])
         tpsa = torch.FloatTensor(tpsa)
         molr = torch.FloatTensor(molr)
-        logPs = torch.FloatTensor(logPs)
         splogvsa = torch.FloatTensor(splogvsa)
         peoe = torch.FloatTensor(peoe)
         if self.args.cuda or next(self.parameters()).is_cuda:
             tpsa = tpsa.cuda()
             molr = molr.cuda()
-            logPs = logPs.cuda()
             splogvsa = splogvsa.cuda()
             peoe = peoe.cuda()
 
@@ -190,7 +188,6 @@ class MPNEncoder(nn.Module):
         mol_vecs = torch.stack(mol_vecs, dim=0)  # (num_molecules, hidden_size)
         mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
         mol_vecs = torch.cat([mol_vecs, molr], dim=1)
-        mol_vecs = torch.cat([mol_vecs, logPs], dim=1)
         mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
         mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
 

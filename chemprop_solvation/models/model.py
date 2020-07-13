@@ -58,12 +58,12 @@ class MoleculeModel(nn.Module):
             first_linear_dim = args.features_size
         else:
             first_linear_dim = args.hidden_size
-            first_linear_dim += 2  # 2 mole features added
+            first_linear_dim += 28  # 2 mole features added
             if args.use_input_features:
                 first_linear_dim += args.features_dim
             if self.solvation:
                 first_linear_dim += args.hidden_size
-                first_linear_dim += 2  # 2 mole features per molecule
+                first_linear_dim += 28  # 2 mole features per molecule
             if args.Tmelt:
                 first_linear_dim += 0
         dropout = nn.Dropout(args.dropout)
