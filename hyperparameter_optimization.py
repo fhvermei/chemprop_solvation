@@ -102,7 +102,7 @@ def grid_search(args: Namespace):
 if __name__ == '__main__':
     parser = ArgumentParser()
     add_train_args(parser)
-    parser.add_argument('--num_iters', type=int, default=50,
+    parser.add_argument('--num_iters', type=int, default=100,
                         help='Number of hyperparameter choices to try')
     parser.add_argument('--config_save_path', type=str, required=True,
                         help='Path to .json file where best hyperparameter settings will be written')
