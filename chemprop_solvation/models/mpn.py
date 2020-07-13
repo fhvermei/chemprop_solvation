@@ -11,6 +11,7 @@ from chemprop_solvation.nn_utils import index_select_ND, get_activation_function
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Crippen
+from rdkit.Chem import rdPartialCharges
 #from rmgpy.molecule import Molecule
 #import quantities
 #import cython
@@ -130,13 +131,29 @@ class MPNEncoder(nn.Module):
         atom_hiddens = self.act_func(self.W_o(a_input))  # num_atoms x hidden
         atom_hiddens = self.dropout_layer(atom_hiddens)  # num_atoms x hidden
 
-        tpsa, molr = [], []
+        tpsa = []
+        molr = []
+        peoe = []
+        logPs = []
+        splogvsa = []
         for mol in mol_graph.getsmiles():
-            tpsa.append([AllChem.CalcTPSA(Chem.MolFromSmiles(mol)) / 100.0])
-            molr.append([Crippen.MolMR(Chem.MolFromSmiles(mol)) / 100.0])
-        tpsa, molr = torch.FloatTensor(tpsa), torch.FloatTensor(molr)
+            mol = Chem.MolFromSmiles(mol)
+            tpsa.append([AllChem.CalcTPSA(mol) / 100.0])
+            molr.append([Crippen.MolMR(mol) / 100.0])
+            logPs.append([Crippen.MolLogP(mol) / 10.0])
+            splogvsa.append([i/100.0 for i in AllChem.SlogP_VSA_(mol)])
+            peoe.append([i/100.0 for i in AllChem.PEOE_VSA_(mol)])
+        tpsa = torch.FloatTensor(tpsa)
+        molr = torch.FloatTensor(molr)
+        logPs = torch.FloatTensor(logPs)
+        splogvsa = torch.FloatTensor(splogvsa)
+        peoe = torch.FloatTensor(peoe)
         if self.args.cuda or next(self.parameters()).is_cuda:
-            tpsa, molr = tpsa.cuda(), molr.cuda()
+            tpsa = tpsa.cuda()
+            molr = molr.cuda()
+            logPs = logPs.cuda()
+            splogvsa = splogvsa.cuda()
+            peoe = peoe.cuda()
 
         if self.args.Tmelt:
             sssr = list()
@@ -173,6 +190,9 @@ class MPNEncoder(nn.Module):
         mol_vecs = torch.stack(mol_vecs, dim=0)  # (num_molecules, hidden_size)
         mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
         mol_vecs = torch.cat([mol_vecs, molr], dim=1)
+        mol_vecs = torch.cat([mol_vecs, logPs], dim=1)
+        mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
+        mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
 
         if self.use_input_features:
             features_batch = features_batch.to(mol_vecs)
