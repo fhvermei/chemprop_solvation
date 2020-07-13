@@ -18,13 +18,13 @@ from chemprop_solvation.utils import create_logger, makedirs
 
 SPACE = {
     'hidden_size': hp.quniform('hidden_size', low=100, high=500, q=100),
-    'depth': hp.quniform('depth', low=3, high=5, q=1),
+    'depth': hp.quniform('depth', low=2, high=4, q=1),
     'dropout': hp.quniform('dropout', low=0.0, high=0.3, q=0.05),
-    'ffn_num_layers': hp.quniform('ffn_num_layers', low=2, high=5, q=1),
+    'ffn_num_layers': hp.quniform('ffn_num_layers', low=2, high=4, q=1),
     'ffn_hidden_size': hp.quniform('ffn_hidden_size', low=400, high=1000, q=200),
     'warmup_epochs': hp.quniform('warmup_epochs', low=2, high=6, q=2),
     'batch_size': hp.quniform('batch_size', low=10, high=100, q=10),
-    'epochs': hp.quniform('epochs', low=20, high=300, q=50),
+    'epochs': hp.quniform('epochs', low=50, high=300, q=50),
     'init_lr': hp.loguniform('init_lr', low=-11, high=-5),
     'max_lr': hp.loguniform('max_lr', low=-11, high=-5),
     'final_lr': hp.loguniform('final_lr', low=-14, high=-7)
