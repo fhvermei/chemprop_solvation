@@ -186,10 +186,10 @@ class MPNEncoder(nn.Module):
                 mol_vecs.append(mol_vec)
 
         mol_vecs = torch.stack(mol_vecs, dim=0)  # (num_molecules, hidden_size)
-        mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
-        mol_vecs = torch.cat([mol_vecs, molr], dim=1)
-        mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
-        mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
+        #mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
+        #mol_vecs = torch.cat([mol_vecs, molr], dim=1)
+        #mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
+        #mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
 
         if self.use_input_features:
             features_batch = features_batch.to(mol_vecs)
@@ -268,7 +268,7 @@ class MPN_solvation(nn.Module):
 
     def forward(self,
                 batch: Union[List[List[str]], BatchMolGraph, BatchMolGraph],
-                features_batch: List[np.ndarray] = None) -> torch.FloatTensor:
+                features_batch: List[List[np.ndarray]] = None) -> torch.FloatTensor:
         """
         Encodes a batch of molecular SMILES strings.
 
@@ -278,9 +278,10 @@ class MPN_solvation(nn.Module):
         """
         if not self.graph_input:  # if features only, batch won't even be used
             batch_solvent, batch_solute = mol2graph_solvation(batch, self.args)
+        features_batch = np.array(features_batch)
 
-        output_solute = self.encoder_solute.forward(batch_solute, features_batch)
-        output_solvent = self.encoder_solvent.forward(batch_solvent, features_batch)
+        output_solute = self.encoder_solute.forward(batch_solute, features_batch[:, 0])
+        output_solvent = self.encoder_solvent.forward(batch_solvent, features_batch[:, 1])
 
         output = torch.cat([output_solvent, output_solute], dim=1)
 

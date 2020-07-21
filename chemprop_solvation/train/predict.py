@@ -31,7 +31,7 @@ def predict(model: nn.Module,
         # Prepare batch
         mol_batch = MoleculeDataset(data[i:i + batch_size])
         if data.is_solvation():
-            smiles_batch, features_batch = mol_batch.solvation_set_smiles(), mol_batch.features()
+            smiles_batch, features_batch = mol_batch.solvation_set_smiles(), mol_batch.solvation_set_features()
         else:
             smiles_batch, features_batch = mol_batch.smiles(), mol_batch.features()
 

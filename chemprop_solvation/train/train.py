@@ -56,6 +56,7 @@ def train(model: nn.Module,
         smiles_batch, features_batch, target_batch = mol_batch.smiles(), mol_batch.features(), mol_batch.targets()
         if args.solvation:
             smiles_batch = mol_batch.solvation_set_smiles()
+            features_batch = mol_batch.solvation_set_features()
 
         batch = smiles_batch
         mask = torch.Tensor([[x is not None for x in tb] for tb in target_batch])
