@@ -38,6 +38,8 @@ class MoleculeDatapoint:
             raise ValueError('Currently cannot provide both loaded features and a features generator.')
 
         self.features = features
+        self.features_solute = None
+        self.solvation_set_features = None
 
         # compound_names not enabled for solvation
         if use_compound_names:
@@ -110,7 +112,7 @@ class MoleculeDatapoint:
         if self.features is not None:
             replace_token = 0
             self.features = np.where(np.isnan(self.features), replace_token, self.features)
-        if self.solvation and self.features_solute is not None:
+        if self.solvation and self.features_solute:
             replace_token = 0
             self.features_solute = np.where(np.isnan(self.features_solute), replace_token, self.features_solute)
 
