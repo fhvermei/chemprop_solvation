@@ -90,7 +90,7 @@ class MoleculeDatapoint:
                     self.features.extend(features_generator(self.mol))
 
             self.features = np.array(self.features)
-            if len(self.features_solute) != 200:
+            if len(self.features) != 200:
                 print(self.solvation_set_smiles)
 
             if self.solvation:
