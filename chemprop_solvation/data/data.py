@@ -90,10 +90,11 @@ class MoleculeDatapoint:
                 features_generator = get_features_generator(fg)
                 if self.mol is not None and self.mol.GetNumHeavyAtoms() > 0:
                     self.features.extend(features_generator(self.mol))
+                # for H2
+                elif self.mol is not None and self.mol.GetNumHeavyAtoms() == 0:
+                    self.features.extend(np.zeros(200))
 
             self.features = np.array(self.features)
-            if len(self.features) != 200:
-                print(self.solvation_set_smiles)
 
             if self.solvation:
                 self.features_solute = []
@@ -101,10 +102,11 @@ class MoleculeDatapoint:
                     features_generator = get_features_generator(fg)
                     if self.solute_mol is not None and self.solute_mol.GetNumHeavyAtoms() > 0:
                         self.features_solute.extend(features_generator(self.solute_mol))
+                    # for H2
+                    elif self.solute_mol is not None and self.solute_mol.GetNumHeavyAtoms() == 0:
+                        self.features_solute.extend(np.zeros(200))
 
                 self.features_solute = np.array(self.features_solute)
-                if len(self.features_solute) != 200:
-                    print(self.solvation_set_smiles)
                 self.solvation_set_features = [self.features, self.features_solute]
 
 
@@ -112,7 +114,7 @@ class MoleculeDatapoint:
         if self.features is not None:
             replace_token = 0
             self.features = np.where(np.isnan(self.features), replace_token, self.features)
-        if self.solvation and self.features_solute:
+        if self.solvation and self.features_solute is not None:
             replace_token = 0
             self.features_solute = np.where(np.isnan(self.features_solute), replace_token, self.features_solute)
 
