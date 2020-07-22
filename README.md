@@ -223,6 +223,6 @@ qm9 | 133,884 |	2.03 ± 0.021	| 2.4 ± 1.1 |
 Lastly, you can find the code to our original repo at https://github.com/wengong-jin/chemprop and for the Mayr et al. baseline at https://github.com/yangkevin2/lsc_experiments . 
 
 ## Adjustments for solvation / dual molecular representation
-The atom, bond and molecular features used by default are different from those used in standard chemprop. The are adjusted to include more solvation-specific featurization. Retraining a model on old data will give other results compared to the original version of chemprop.
+The atom, bond and molecular features used by default are different from those used in standard chemprop. They are adjusted to include more solvation specific featurization. Retraining a model on old data will give other results compared to the original version of chemprop.
 The keyword --solvation triggers the reading of 2 molecules from the csv file (the first two columns of the csv file), while the targets are given starting from the third column.
 
