@@ -114,11 +114,11 @@ class MoleculeDatapoint:
         if self.features is not None:
             replace_token = 0
             self.features = np.where(np.isnan(self.features), replace_token, self.features)
-            self.features = np.where(not np.isfinite(self.features), replace_token, self.features)
+            #self.features = np.where(not np.isfinite(self.features), replace_token, self.features)
         if self.solvation and self.features_solute is not None:
             replace_token = 0
             self.features_solute = np.where(np.isnan(self.features_solute), replace_token, self.features_solute)
-            self.features_solute = np.where(not np.isfinite(self.features_solute), replace_token, self.features_solute)
+            #self.features_solute = np.where(not np.isfinite(self.features_solute), replace_token, self.features_solute)
 
         # Create targets
         if self.solvation:
