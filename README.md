@@ -1,3 +1,5 @@
+From https://github.com/chemprop/chemprop
+
 # Property Prediction
 This repository contains message passing neural networks for molecular property prediction.
 
