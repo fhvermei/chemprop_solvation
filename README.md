@@ -224,5 +224,5 @@ Lastly, you can find the code to our original repo at https://github.com/wengong
 
 ## Adjustments for solvation / dual molecular representation
 The atom, bond and molecular features used by default are different from those used in standard chemprop. They are adjusted to include more solvation specific featurization. Retraining a model on old data will give other results compared to the original version of chemprop.
-The keyword --solvation triggers the reading of 2 molecules from the csv file (the first two columns of the csv file), while the targets are given starting from the third column.
+The keyword `--solvation` triggers the reading of 2 molecules from the csv file (the first two columns of the csv file), while the targets are given starting from the third column.
 
