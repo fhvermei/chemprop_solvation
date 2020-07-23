@@ -93,7 +93,7 @@ def evaluate(model: nn.Module,
         data=data,
         batch_size=batch_size,
         scaler=scaler
-    )
+    )[0]
 
     targets = data.targets()
 

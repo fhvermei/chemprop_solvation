@@ -315,7 +315,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
         )
 
         test_scores = evaluate_predictions(
-            preds=test_preds,
+            preds=test_preds[0],
             targets=test_targets,
             num_tasks=args.num_tasks,
             metric_func=metric_func,
@@ -324,7 +324,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
         )
 
         if len(test_preds) != 0:
-            sum_test_preds += np.array(test_preds)
+            sum_test_preds += np.array(test_preds[0])
 
         # Average test score
         avg_test_score = np.nanmean(test_scores)
@@ -341,35 +341,50 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
             f2 = open(os.path.join(args.save_dir, 'summary_results_model_'+str(model_idx)+'.csv'), 'w')
             writer2 = csv.writer(f2)
             writer2.writerow(["dataset", "rmse", "mae", "max"])
-            for dataset, name, pred in [(train_data, 'train', train_preds), (val_data, 'val', val_preds),
+            for dataset, name, predi in [(train_data, 'train', train_preds), (val_data, 'val', val_preds),
                                         (test_data, 'test', test_preds)]:
                 with open(os.path.join(args.save_dir, name + '_results_model_'+str(model_idx)+'.csv'), 'w') as f:
                     writer_summary = csv.writer(f)
                     rmse = 0
                     mae = 0
                     maxe = 0
+                    pred = predi[0]
+                    if args.aleatoric:
+                        ale_unc = predi[1]
+                    else:
+                        ale_unc = None
                     if args.solvation:
-                        writer_summary.writerow(["smiles_solvent", "smiles_solute",
-                                                 "targets", "predictions", "diff", "diff^2"])
+                        row = ["smiles_solvent", "smiles_solute",
+                                                 "targets", "predictions", "diff", "diff^2"]
+                        if args.aleatoric:
+                            row.append("aleatoric_uncertainty")
+                        writer_summary.writerow(row)
                         for count in range(len(dataset)):
                             mae_part = np.abs(dataset.targets()[count][0]-pred[count][0])
                             rmse_part = np.power(dataset.targets()[count][0]-pred[count][0], 2)
-                            writer_summary.writerow([dataset.solvation_set_smiles()[count][0],
+                            row = [dataset.solvation_set_smiles()[count][0],
                                                      dataset.solvation_set_smiles()[count][1],
                                                      dataset.targets()[count][0], pred[count][0],
-                                                     mae_part, rmse_part])
+                                                     mae_part, rmse_part]
+                            if args.aleatoric:
+                                row.append(ale_unc[count][0])
+                            writer_summary.writerow(row)
                             rmse += rmse_part
                             mae += mae_part
                             maxe = mae_part if mae_part > maxe else maxe
                             # need to be adjusted for the case that you have more targets
                     else:
-                        writer_summary.writerow(["smiles", "targets", "predictions"])
+                        row = ["smiles", "targets", "predictions", "diff", "diff^2"]
+                        if args.aleatoric:
+                            row.append("aleatoric_uncertainty")
+                        writer_summary.writerow(row)
                         for count in range(len(dataset)):
                             mae_part = np.abs(dataset.targets()[count][0]-pred[count][0])
                             rmse_part = np.power(dataset.targets()[count][0]-pred[count][0], 2)
-                            writer_summary.writerow([dataset.smiles()[count],
-                                                     dataset.targets()[count][0], pred[count][0],
-                                                     mae_part, rmse_part])
+                            row = [dataset.smiles()[count], dataset.targets()[count][0], pred[count][0], mae_part, rmse_part]
+                            if args.aleatoric:
+                                row.append(ale_unc[count][0])
+                            writer_summary.writerow(row)
                             rmse += rmse_part
                             mae += mae_part
                             maxe = mae_part if mae_part > maxe else maxe
