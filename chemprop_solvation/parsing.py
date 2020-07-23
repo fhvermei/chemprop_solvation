@@ -45,6 +45,10 @@ def add_predict_args(parser: ArgumentParser):
                         help='Maximum number of data points to load')
     parser.add_argument('--solvation', action='store_true', default=False,
                         help='account for 2 input molecules, in this case solvent and solute')
+    parser.add_argument('--aleatoric', action='store_true', default=False,
+                        help='Compute aleatoric uncertainty')
+    parser.add_argument('--ensemble_variance', action='store_true', default=False,
+                        help='Compute epistemic uncertainty from ensemble variance')
 
 
 def add_train_args(parser: ArgumentParser):
@@ -189,6 +193,8 @@ def add_train_args(parser: ArgumentParser):
                         help='Gives detailed results and figures')
     parser.add_argument('--aleatoric', action='store_true', default=False,
                         help='Compute aleatoric uncertainty')
+    parser.add_argument('--ensemble_variance', action='store_true', default=False,
+                        help='Compute epistemic uncertainty from ensemble variance')
 
 def update_checkpoint_args(args: Namespace):
     """

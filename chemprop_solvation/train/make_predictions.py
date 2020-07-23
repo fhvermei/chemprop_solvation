@@ -59,9 +59,11 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
     if args.dataset_type == 'multiclass':
         sum_preds = np.zeros((len(test_data), args.num_tasks, args.multiclass_num_classes))
         sum_ale_uncs = np.zeros((len(test_data), args.num_tasks, args.multiclass_num_classes))
+        sum_epi_uncs = np.zeros((len(test_data), args.num_tasks, args.multiclass_num_classes))
     else:
         sum_preds = np.zeros((len(test_data), args.num_tasks))
         sum_ale_uncs = np.zeros((len(test_data), args.num_tasks))
+        sum_epi_uncs = np.zeros((len(test_data), args.num_tasks))
 
     print(f'Predicting with an ensemble of {len(args.checkpoint_paths)} models')
     for checkpoint_path in tqdm(args.checkpoint_paths, total=len(args.checkpoint_paths)):
@@ -76,28 +78,48 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
         sum_preds += np.array(model_preds)
         if ale_uncs is not None:
             sum_ale_uncs += np.array(ale_uncs)
+        if args.ensemble_variance:
+            all_preds[:, :, index] = model_preds
 
     # Ensemble predictions
     avg_preds = sum_preds / len(args.checkpoint_paths)
     avg_preds = avg_preds.tolist()
 
-    avg_ale_uncs = sum_ale_uncs / len(args.checkpoint_paths)
-    avg_ale_uncs = avg_ale_uncs.tolist()
+    if args.aleatoric:
+        avg_ale_uncs = sum_ale_uncs / len(args.checkpoint_paths)
+        avg_ale_uncs = avg_ale_uncs.tolist()
+
+    if args.ensemble_variance:
+        epi_uncs = np.var(all_preds, axis=2)
+        epi_uncs = epi_uncs.tolist()
 
     # Save predictions
     assert len(test_data) == len(avg_preds)
-    assert len(test_data) == len(avg_ale_uncs)
+    if args.aleatoric:
+        assert len(test_data) == len(avg_ale_uncs)
+    if args.ensemble_variance:
+        assert len(test_data) == len(epi_uncs)
     print(f'Saving predictions to {args.preds_path}')
 
     # Put Nones for invalid smiles
     full_preds = [None] * len(full_data)
-    full_ale_uncs = [None] * len(full_data)
+    if args.aleatoric:
+        full_ale_uncs = [None] * len(full_data)
+    if args.ensemble_variance:
+        full_epi_uncs = [None] * len(full_data)
 
     for i, si in enumerate(valid_indices):
         full_preds[si] = avg_preds[i]
-        full_ale_uncs[si] = avg_ale_uncs[i]
+        if args.aleatoric:
+            full_ale_uncs[si] = avg_ale_uncs[i]
+        if args.ensemble_variance:
+            full_epi_uncs[si] = epi_uncs[i]
+
     avg_preds = full_preds
-    avg_ale_uncs = full_ale_uncs
+    if args.aleatoric:
+        avg_ale_uncs = full_ale_uncs
+    if args.ensemble_variance:
+        epi_uncs = full_epi_uncs
 
     if args.solvation:
         test_inchis = full_data.solvation_set_smiles()
@@ -121,7 +143,10 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
                     header.append(name + '_class' + str(i))
         else:
             header.extend(args.task_names)
-            header.extend([tn + "_ale_unc" for tn in args.task_names])
+            if args.aleatoric:
+                header.extend([tn + "_ale_unc" for tn in args.task_names])
+            if args.ensemble_variance:
+                header.extend([tn + "_epi_unc" for tn in args.task_names])
 
         writer.writerow(header)
 
@@ -139,7 +164,10 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
                         row.extend(task_probs)
                 else:
                     row.extend(avg_preds[i])
-                    row.extend(avg_ale_uncs[i])
+                    if args.aleatoric:
+                        row.extend(avg_ale_uncs[i])
+                    if args.ensemble_variance:
+                        row.extend(epi_uncs[i])
             else:
                 if args.dataset_type == 'multiclass':
                     row.extend([''] * args.num_tasks * args.multiclass_num_classes)
