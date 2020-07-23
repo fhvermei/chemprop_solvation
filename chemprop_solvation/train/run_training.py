@@ -380,6 +380,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
                     ax.plot(dataset.targets()[:], pred[:], 'b.')
                     ax.set(xlabel='targets', ylabel='predictions')
                     fig.savefig(os.path.join(args.save_dir, name + '_parity_model_'+str(model_idx)+'.png'))
+                    plt.close()
 
 
     # Evaluate ensemble on test set
