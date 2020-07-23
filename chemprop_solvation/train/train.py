@@ -72,7 +72,6 @@ def train(model: nn.Module,
 
         # Run model
         model.zero_grad()
-        print(smiles_batch)
         preds = model(batch, features_batch)
 
         if args.dataset_type == 'multiclass':
