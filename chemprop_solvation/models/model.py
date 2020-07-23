@@ -145,7 +145,7 @@ def build_model(args: Namespace) -> nn.Module:
     if args.dataset_type == 'multiclass':
         args.output_size *= args.multiclass_num_classes
 
-    model = MoleculeModel(classification=args.dataset_type == 'classification', multiclass=args.dataset_type == 'multiclass')
+    model = MoleculeModel(classification=args.dataset_type == 'classification', multiclass=args.dataset_type == 'multiclass', aleatoric=args.aleatoric)
 
     if args.solvation:
         model.create_encoder_solvent(args)
