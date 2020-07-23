@@ -63,3 +63,15 @@ class StandardScaler:
         transformed_with_none = np.where(np.isnan(transformed_with_nan), self.replace_nan_token, transformed_with_nan)
 
         return transformed_with_none
+
+    def inverse_transform_variance(self, X: List[List[float]]):
+        """
+        Performs the inverse transformation by the squares of the standard deviations.
+        :param X: A list of lists of floats.
+        :return: The inverse transformed data.
+        """
+        X = np.array(X).astype(float)
+        transformed_with_nan = X * (self.stds**2)
+        transformed_with_none = np.where(np.isnan(transformed_with_nan), self.replace_nan_token, transformed_with_nan)
+
+        return transformed_with_none

@@ -152,6 +152,19 @@ def load_task_names(path: str) -> List[str]:
     return load_args(path).task_names
 
 
+def heteroscedastic_loss(true, mean, log_var):
+    """
+    Compute the heteroscedastic loss for regression.
+    :param true: A list of true values.
+    :param mean: A list of means (output predictions).
+    :param mean: A list of logvars (log of predicted variances).
+    :return: Computed loss.
+    """
+    precision = torch.exp(-log_var)
+    loss = precision * (true - mean)**2 + log_var
+    return loss
+
+
 def get_loss_func(args: Namespace) -> nn.Module:
     """
     Gets the loss function corresponding to a given dataset type.
@@ -161,6 +174,9 @@ def get_loss_func(args: Namespace) -> nn.Module:
     """
     if args.dataset_type == 'classification':
         return nn.BCEWithLogitsLoss(reduction='none')
+
+    if args.dataset_type == 'regression' and args.aleatoric:
+        return heteroscedastic_loss
 
     if args.dataset_type == 'regression':
         return nn.MSELoss(reduction='none')

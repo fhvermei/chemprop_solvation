@@ -24,8 +24,10 @@ def predict(model: nn.Module,
     model.eval()
 
     preds = []
-
+    ale_unc = []
     num_iters, iter_step = len(data), batch_size
+
+    aleatoric = model.aleatoric
 
     for i in trange(0, num_iters, iter_step):
         # Prepare batch
@@ -38,17 +40,38 @@ def predict(model: nn.Module,
         # Run model
         batch = smiles_batch
 
-        with torch.no_grad():
-            batch_preds = model(batch, features_batch)
+        if not aleatoric:
+            with torch.no_grad():
+                batch_preds = model(batch, features_batch)
 
-        batch_preds = batch_preds.data.cpu().numpy()
+            batch_preds = batch_preds.data.cpu().numpy()
 
-        # Inverse scale if regression
-        if scaler is not None:
-            batch_preds = scaler.inverse_transform(batch_preds)
+            # Inverse scale if regression
+            if scaler is not None:
+                batch_preds = scaler.inverse_transform(batch_preds)
 
-        # Collect vectors
-        batch_preds = batch_preds.tolist()
-        preds.extend(batch_preds)
+            # Collect vectors
+            batch_preds = batch_preds.tolist()
+            preds.extend(batch_preds)
+        else:
+            with torch.no_grad():
+                batch_preds, batch_logvar = model(batch, features_batch)
+                batch_var = torch.exp(batch_logvar)
+            batch_preds = batch_preds.data.cpu().numpy()
+            batch_ale_unc = batch_var.data.cpu().numpy()
 
-    return preds
+            # Inverse scale if regression
+            if scaler is not None:
+                batch_preds = scaler.inverse_transform(batch_preds)
+                batch_ale_unc = scaler.inverse_transform_variance(batch_ale_unc)
+
+            # Collect vectors
+            batch_preds = batch_preds.tolist()
+            batch_ale_unc = batch_ale_unc.tolist()
+            preds.extend(batch_preds)
+            ale_unc.extend(batch_ale_unc)
+
+    if not aleatoric:
+        return preds, None
+    else:
+        return preds, ale_unc

@@ -11,7 +11,7 @@ from chemprop_solvation.nn_utils import get_activation_function, initialize_weig
 class MoleculeModel(nn.Module):
     """A MoleculeModel is a model which contains a message passing network following by feed-forward layers."""
 
-    def __init__(self, classification: bool, multiclass: bool):
+    def __init__(self, classification: bool, multiclass: bool, aleatoric: bool):
         """
         Initializes the MoleculeModel.
 
@@ -26,6 +26,7 @@ class MoleculeModel(nn.Module):
         if self.multiclass:
             self.multiclass_softmax = nn.Softmax(dim=2)
         assert not (self.classification and self.multiclass)
+        self.aleatoric = aleatoric
 
     def create_encoder(self, args: Namespace):
         """
@@ -91,11 +92,18 @@ class MoleculeModel(nn.Module):
             ffn.extend([
                 activation,
                 dropout,
-                nn.Linear(args.ffn_hidden_size, args.output_size, bias=args.bias_ffn),
+
             ])
+            last_linear_dim = args.ffn_hidden_size
 
         # Create FFN model
         self.ffn = nn.Sequential(*ffn)
+
+        if self.aleatoric:
+            self.output_layer = nn.Linear(last_linear_dim, args.output_size)
+            self.logvar_layer = nn.Linear(last_linear_dim, args.output_size)
+        else:
+            self.output_layer = nn.Linear(last_linear_dim, args.output_size)
 
     def forward(self, *input):
         """
@@ -105,7 +113,15 @@ class MoleculeModel(nn.Module):
         :return: The output of the MoleculeModel.
         """
 
-        output = self.ffn(self.encoder(*input))
+        _output = self.ffn(self.encoder(*input))
+
+        if self.aleatoric:
+            output = self.output_layer(_output)
+            logvar = self.logvar_layer(_output)
+            return output, logvar
+        else:
+            output = self.output_layer(_output)
+
         # Don't apply sigmoid during training b/c using BCEWithLogitsLoss
         if self.classification and not self.training:
             output = self.sigmoid(output)
