@@ -20,7 +20,7 @@ from chemprop_solvation.data.utils import get_class_sizes, get_data, get_task_na
 from chemprop_solvation.models import build_model
 from chemprop_solvation.nn_utils import param_count
 from chemprop_solvation.utils import build_optimizer, build_lr_scheduler, get_loss_func, get_metric_func, load_checkpoint,\
-    makedirs, save_checkpoint
+    makedirs, save_checkpoint, write_ensemble_summary_file
 from rdkit import Chem
 import matplotlib.pyplot as plt
 
@@ -395,6 +395,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
                     ax.plot(dataset.targets()[:], pred[:], 'b.')
                     ax.set(xlabel='targets', ylabel='predictions')
                     fig.savefig(os.path.join(args.save_dir, name + '_parity_model_'+str(model_idx)+'.png'))
+                    plt.close()
 
 
     # Evaluate ensemble on test set
@@ -419,5 +420,8 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
     if args.show_individual_scores:
         for task_name, ensemble_score in zip(args.task_names, ensemble_scores):
             info(f'Ensemble test {task_name} {args.metric} = {ensemble_score:.6f}')
+
+    if args.ensemble_variance:
+        write_ensemble_summary_file(args)
 
     return ensemble_scores

@@ -325,6 +325,10 @@ def modify_train_args(args: Namespace):
     if args.test:
         args.epochs = 0
 
+    #write detailed results if we want to calculate variance. csv files are used to merge together
+    if args.ensemble_variance:
+        args.detailed_results = True
+
 
 def parse_train_args() -> Namespace:
     """

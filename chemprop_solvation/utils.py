@@ -3,6 +3,7 @@ import math
 import os
 from typing import Callable, List, Tuple, Union
 from argparse import Namespace
+import pandas as pd
 
 from sklearn.metrics import auc, mean_absolute_error, mean_squared_error, precision_recall_curve, r2_score,\
     roc_auc_score, accuracy_score, log_loss
@@ -345,3 +346,39 @@ def create_logger(name: str, save_dir: str = None, quiet: bool = False) -> loggi
         logger.addHandler(fh_q)
 
     return logger
+
+
+def write_ensemble_summary_file(args: Namespace):
+    folds = args.num_folds
+    models = args.ensemble_size
+    names = ["train", "val", "test"]
+    for fold_id in range(folds):
+        path = args.save_dir
+
+        for name in names:
+            prediction_columns = []
+            uncertainty_columns = []
+            df = pd.DataFrame()
+            for model_id in range(models):
+                df_temp = pd.read_csv(path+'/'+name+'_results_model_'+str(model_id)+'.csv')
+                if not 'targets' in df.columns:
+                    if args.solvation:
+                        df['smiles_solvent'] = df_temp.smiles_solvent
+                        df['smiles_solute'] = df_temp.smiles_solute
+                    else:
+                        df['smiles'] = df_temp.smiles
+                    df['targets'] = df_temp.targets
+                n = "prediction_" + str(model_id)
+                df[n] = df_temp.predictions
+                prediction_columns.append(n)
+                if args.aleatoric:
+                    n = "ale_unc_" + str(model_id)
+                    df[n] = df_temp.aleatoric_uncertainty
+                    uncertainty_columns.append(n)
+            df["average_prediction"] = df[prediction_columns].mean(axis=1)
+            if args.aleatoric:
+                df["average_ale_unc"] = df[uncertainty_columns].mean(axis=1)
+            df["ensemble_variance"] = df[prediction_columns].var(axis=1)
+            df.to_csv(path + "/ensemble_summary_" + name + ".csv", index=False)
+
+
