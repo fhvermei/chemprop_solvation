@@ -84,7 +84,7 @@ def initialize_weights(model: nn.Module):
         if param.dim() == 1:
             nn.init.constant_(param, 0)
         else:
-            torch.manual_seed(0)
+            #torch.manual_seed(0)
             nn.init.xavier_normal_(param)
             #nn.init.constant_(param, 0.00001)
 
