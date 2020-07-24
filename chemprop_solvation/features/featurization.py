@@ -120,8 +120,8 @@ def atom_features(atom: Chem.rdchem.Atom, functional_groups: List[int] = None) -
 
 def get_atomic_number(atom: Chem.rdchem.Atom) -> int:
     nr = atom.GetAtomicNum()-1
-    if nr>17:
-        nr = 17
+    if nr>54:
+        nr = 0
     return nr
 
 
