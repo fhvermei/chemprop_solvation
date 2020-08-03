@@ -280,8 +280,8 @@ class MPN_solvation(nn.Module):
             batch_solvent, batch_solute = mol2graph_solvation(batch, self.args)
         features_batch = np.array(features_batch)
 
-        output_solute = self.encoder_solute.forward(batch_solute, features_batch[:, 0] if features_batch is not None else None)
-        output_solvent = self.encoder_solvent.forward(batch_solvent, features_batch[:, 1] if features_batch is not None else None)
+        output_solvent = self.encoder_solvent.forward(batch_solvent, features_batch[:, 0] if features_batch is not None else None)
+        output_solute = self.encoder_solute.forward(batch_solute, features_batch[:, 1] if features_batch is not None else None)
 
         output = torch.cat([output_solvent, output_solute], dim=1)
 
