@@ -77,7 +77,7 @@ class MPNEncoder(nn.Module):
         :return: A PyTorch tensor of shape (num_molecules, hidden_size) containing the encoding of each molecule.
         """
 
-        if self.use_input_features:
+        if self.use_input_features and not features_batch is None:
             features_batch = torch.from_numpy(np.stack(features_batch)).float()
 
             if self.args.cuda:
@@ -192,7 +192,7 @@ class MPNEncoder(nn.Module):
         mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
         #mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
 
-        if self.use_input_features:
+        if self.use_input_features and not features_batch is None:
             features_batch = features_batch.to(mol_vecs)
             if len(features_batch.shape) == 1:
                 features_batch = features_batch.view([1, features_batch.shape[0]])
@@ -269,7 +269,7 @@ class MPN_solvation(nn.Module):
 
     def forward(self,
                 batch: Union[List[List[str]], BatchMolGraph, BatchMolGraph],
-                features_batch: List[List[np.ndarray]] = None) -> torch.FloatTensor:
+                features_batch: List[np.ndarray] = None) -> torch.FloatTensor:
         """
         Encodes a batch of molecular SMILES strings.
 
@@ -281,8 +281,8 @@ class MPN_solvation(nn.Module):
             batch_solvent, batch_solute = mol2graph_solvation(batch, self.args)
         features_batch = np.array(features_batch)
 
-        output_solvent = self.encoder_solvent.forward(batch_solvent, features_batch[:, 0] if features_batch is not None else None)
-        output_solute = self.encoder_solute.forward(batch_solute, features_batch[:, 1] if features_batch is not None else None)
+        output_solvent = self.encoder_solvent.forward(batch_solvent, None)
+        output_solute = self.encoder_solute.forward(batch_solute, features_batch if features_batch is not None else None)
 
         output = torch.cat([output_solvent, output_solute], dim=1)
 

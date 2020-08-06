@@ -107,17 +107,12 @@ class MoleculeDatapoint:
                         self.features_solute.extend(np.zeros(200))
 
                 self.features_solute = np.array(self.features_solute)
-
+                self.features = np.append(self.features, self.features_solute)
 
         # Fix nans in features
         if self.features is not None:
             replace_token = 0
             self.features = np.where(np.isnan(self.features), replace_token, self.features)
-        if self.solvation and self.features_solute is not None:
-            replace_token = 0
-            self.features_solute = np.where(np.isnan(self.features_solute), replace_token, self.features_solute)
-
-        self.solvation_set_features = [self.features, self.features_solute]
 
         # Create targets
         if self.solvation:
@@ -276,17 +271,6 @@ class MoleculeDataset(Dataset):
             return None
 
         return [d.features for d in self.data]
-
-    def solvation_set_features(self) -> List[np.ndarray]:
-        """
-        Returns the features associated with each molecule (if they exist).
-
-        :return: A list of 1D numpy arrays containing the features for each molecule or None if there are no features.
-        """
-        if len(self.data) == 0 or self.data[0].solvation_set_features is None:
-            return None
-
-        return [d.solvation_set_features for d in self.data]
 
     def targets(self) -> List[List[float]]:
         """
