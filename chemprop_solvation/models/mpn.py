@@ -189,7 +189,7 @@ class MPNEncoder(nn.Module):
         #mol_vecs = torch.cat([mol_vecs, tpsa], dim=1)
         #mol_vecs = torch.cat([mol_vecs, molr], dim=1)
         # using this one alone works best for dGsolv for some tests with random and scaffold splits
-        mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
+        # mol_vecs = torch.cat([mol_vecs, splogvsa], dim=1)
         #mol_vecs = torch.cat([mol_vecs, peoe], dim=1)
 
         if self.use_input_features and not features_batch is None:
