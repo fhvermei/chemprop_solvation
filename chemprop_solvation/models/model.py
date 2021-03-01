@@ -58,12 +58,14 @@ class MoleculeModel(nn.Module):
             first_linear_dim = args.features_size
         else:
             first_linear_dim = args.hidden_size
-            first_linear_dim += 12  # rdkit splogvsa is added per molecule
+            if args.solvation_mol_features:
+                first_linear_dim += 12  # rdkit splogvsa is added per molecule
             if args.use_input_features:
                 first_linear_dim += args.features_dim
             if self.solvation:
                 first_linear_dim += args.hidden_size
-                first_linear_dim += 12  # rdkit splogvsa is added per molecule
+                if args.solvation_mol_features:
+                    first_linear_dim += 12  # rdkit splogvsa is added per molecule
                 #if args.use_input_features:
                 #    first_linear_dim += args.features_dim
             if args.Tmelt:
