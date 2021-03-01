@@ -187,8 +187,7 @@ def add_train_args(parser: ArgumentParser):
                         help='Use messages on atoms instead of messages on bonds')
     parser.add_argument('--detailed_results', action='store_true', default=False,
                         help='Gives detailed results and figures')
-    parser.add_argument('--solvation_mol_features', action='store_true', default=False,
-                        help='Adds molecule features specific to solvation models')
+
 
 def update_checkpoint_args(args: Namespace):
     """

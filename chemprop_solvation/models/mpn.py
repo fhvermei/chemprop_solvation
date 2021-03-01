@@ -39,7 +39,7 @@ class MPNEncoder(nn.Module):
         self.features_only = args.features_only
         self.use_input_features = args.use_input_features
         self.args = args
-        self.solvation_mol_features = args.solvation_mol_features
+        self.solvation_mol_features = args.solvation
 
         if self.features_only:
             return
