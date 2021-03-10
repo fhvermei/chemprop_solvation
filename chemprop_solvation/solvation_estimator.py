@@ -129,9 +129,11 @@ def load_ML_estimator(model_dir: str) -> Callable[[List], Tuple[List, List, List
 
     return estimator
 
+
 # Get the absolute path to the ML model directory
 current_dir = os.path.abspath(os.path.dirname(__file__))
-path_to_ML_models = os.path.join(current_dir, '../final_models')
+path_to_ML_models = 'final_models'
+
 
 def load_DirectML_Gsolv_estimator():
     """
@@ -147,6 +149,7 @@ def load_DirectML_Gsolv_estimator():
     path_to_model = os.path.join(path_to_ML_models, 'DirectML_Gsolv')
     return load_ML_estimator(path_to_model)
 
+
 def load_DirectML_Hsolv_estimator():
     """
     Load the DirectML_Hsolv model and return a evaluator function for it.
@@ -160,6 +163,7 @@ def load_DirectML_Hsolv_estimator():
     """
     path_to_model = os.path.join(path_to_ML_models, 'DirectML_Hsolv')
     return load_ML_estimator(path_to_model)
+
 
 def load_SoluteML_estimator():
     """
