@@ -10,6 +10,7 @@ import torch
 import torch.nn as nn
 from torch.optim import Adam, Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
+from importlib import resources
 
 from chemprop_solvation.data import StandardScaler
 from chemprop_solvation.models import build_model, MoleculeModel
@@ -64,10 +65,12 @@ def save_checkpoint(path: str,
 def load_checkpoint(path: str,
                     current_args: Namespace = None,
                     cuda: bool = None,
+                    from_package: bool = False,
                     logger: logging.Logger = None) -> MoleculeModel:
     """
     Loads a model checkpoint.
 
+    :param from_package: Whether to load the model from within a conda package
     :param path: Path where checkpoint is saved.
     :param current_args: The current arguments. Replaces the arguments loaded from the checkpoint if provided.
     :param cuda: Whether to move model to cuda.
@@ -77,7 +80,11 @@ def load_checkpoint(path: str,
     debug = logger.debug if logger is not None else print
 
     # Load model and args
-    state = torch.load(path, map_location=lambda storage, loc: storage)
+    if from_package:
+        state = torch.load(resources.open_binary(path, 'model.pt'),
+                           map_location=lambda storage, loc: storage)
+    else:
+        state = torch.load(path, map_location=lambda storage, loc: storage)
     args, loaded_state_dict = state['args'], state['state_dict']
 
     if current_args is not None:
@@ -114,14 +121,19 @@ def load_checkpoint(path: str,
     return model
 
 
-def load_scalers(path: str) -> Tuple[StandardScaler, StandardScaler]:
+def load_scalers(path: str, from_package: bool = False) -> Tuple[StandardScaler, StandardScaler]:
     """
     Loads the scalers a model was trained with.
 
+    :param from_package: Whether to load the scaler from within a conda package
     :param path: Path where model checkpoint is saved.
     :return: A tuple with the data scaler and the features scaler.
     """
-    state = torch.load(path, map_location=lambda storage, loc: storage)
+    if from_package:
+        state = torch.load(resources.open_binary(path, 'model.pt'),
+                           map_location=lambda storage, loc: storage)
+    else:
+        state = torch.load(path, map_location=lambda storage, loc: storage)
 
     scaler = StandardScaler(state['data_scaler']['means'],
                             state['data_scaler']['stds']) if state['data_scaler'] is not None else None
@@ -132,14 +144,19 @@ def load_scalers(path: str) -> Tuple[StandardScaler, StandardScaler]:
     return scaler, features_scaler
 
 
-def load_args(path: str) -> Namespace:
+def load_args(path: str, from_package: bool = False) -> Namespace:
     """
     Loads the arguments a model was trained with.
 
+    :param from_package: Whether to load the arguments from within a conda package
     :param path: Path where model checkpoint is saved.
     :return: The arguments Namespace that the model was trained with.
     """
-    return torch.load(path, map_location=lambda storage, loc: storage)['args']
+    if from_package:
+        return torch.load(resources.open_binary(path, 'model.pt'),
+                           map_location=lambda storage, loc: storage)['args']
+    else:
+        return torch.load(path, map_location=lambda storage, loc: storage)['args']
 
 
 def load_task_names(path: str) -> List[str]:

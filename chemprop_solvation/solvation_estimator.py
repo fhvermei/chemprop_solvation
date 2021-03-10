@@ -30,13 +30,13 @@ def load_ML_estimator(model_dir: str) -> Callable[[List], Tuple[List, List, List
 
         # Load the arguments and scalers to normalize predictions and features.
         # Each fold has the same arguments and scalers, so only load from the first model.
-        train_args = load_args(model_path[0])
-        scaler, features_scaler = load_scalers(model_path[0])
+        train_args = load_args(model_path[0], from_package=True)
+        scaler, features_scaler = load_scalers(model_path[0], from_package=True)
 
         # Load models in ensemble
         models = []
         for checkpoint_path in model_path:
-            models.append(load_checkpoint(checkpoint_path, cuda=False))
+            models.append(load_checkpoint(checkpoint_path, cuda=False, from_package=True))
 
         fold_scaler_model_dict[fold] = {'train_args': train_args,
                                         'scaler': scaler,
