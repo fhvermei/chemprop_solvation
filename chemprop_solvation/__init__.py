@@ -2,7 +2,6 @@ import chemprop_solvation.data
 import chemprop_solvation.features
 import chemprop_solvation.models
 import chemprop_solvation.train
-import chemprop_solvation.final_models
 
 import chemprop_solvation.solvation_estimator
 import chemprop_solvation.nn_utils

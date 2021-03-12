@@ -8,7 +8,7 @@ from chemprop_solvation.utils import load_args, load_checkpoint, load_scalers
 from chemprop_solvation.data import MoleculeDatapoint, MoleculeDataset
 
 
-def load_ML_estimator(model_dir: str) -> Callable[[List], Tuple[List, List, List]]:
+def load_ML_estimator(model_dir: str, fold_count: int = 5, model_count: int = 5) -> Callable[[List], Tuple[List, List, List]]:
     """
     Load the given ML model and return a function for evaluating it.
 
@@ -16,18 +16,14 @@ def load_ML_estimator(model_dir: str) -> Callable[[List], Tuple[List, List, List
     :return estimator: a function "estimator", which takes a list of solute or solvent-solute SMILES as input
              and returns the predicted solvation properties.
     """
-    # find the number of folds in the model directory and get the path to each fold
-    fold_count = len([file for file in os.listdir(model_dir) if file.startswith('fold_')])
+    
     fold_path = [os.path.join(model_dir, 'fold_' + str(f)) for f in range(fold_count)]
-    # find the number of models in each fold
-    model_count = len([file for file in os.listdir(fold_path[0]) if file.startswith('model_')])
 
     # Load all models and scaler for each fold
     fold_scaler_model_dict = {}
     for fold in fold_path:
         # Get the path to each model in the fold.
         model_path = [os.path.join(fold, 'model_' + str(m), 'model.pt') for m in range(model_count)]
-
         # Load the arguments and scalers to normalize predictions and features.
         # Each fold has the same arguments and scalers, so only load from the first model.
         train_args = load_args(model_path[0], from_package=True)
@@ -63,7 +59,7 @@ def load_ML_estimator(model_dir: str) -> Callable[[List], Tuple[List, List, List
         :return valid_indices: a list of valid SMILES indices that could be used for the prediction.
         """
         # Load the train argument. It's same for all folds, so use the first model of the first fold.
-        train_args = load_args(os.path.join(fold_path[0], 'model_0', 'model.pt'))
+        train_args = load_args(os.path.join(fold_path[0], 'model_0', 'model.pt'), from_package=True)
 
         # Set the feature generator to 'rdkit_2d_normalized' if train_args.solvation is False
         if not train_args.solvation:
@@ -147,7 +143,7 @@ def load_DirectML_Gsolv_estimator():
         Output 3: a list of valid SMILES indices that could be used for the prediction.
     """
     path_to_model = os.path.join(path_to_ML_models, 'DirectML_Gsolv')
-    return load_ML_estimator(path_to_model)
+    return load_ML_estimator(path_to_model, fold_count = 5, model_count = 5)
 
 
 def load_DirectML_Hsolv_estimator():
@@ -162,7 +158,7 @@ def load_DirectML_Hsolv_estimator():
         Output 3: a list of valid SMILES indices that could be used for the prediction.
     """
     path_to_model = os.path.join(path_to_ML_models, 'DirectML_Hsolv')
-    return load_ML_estimator(path_to_model)
+    return load_ML_estimator(path_to_model, fold_count = 5, model_count = 5)
 
 
 def load_SoluteML_estimator():
@@ -177,4 +173,4 @@ def load_SoluteML_estimator():
         Output 3: a list of valid SMILES indices that could be used for the prediction.
     """
     path_to_model = os.path.join(path_to_ML_models, 'SoluteML')
-    return load_ML_estimator(path_to_model)
+    return load_ML_estimator(path_to_model, fold_count = 5, model_count = 5)

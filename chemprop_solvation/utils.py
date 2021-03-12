@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from torch.optim import Adam, Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
-from importlib import resources
+import io, pkgutil
 
 from chemprop_solvation.data import StandardScaler
 from chemprop_solvation.models import build_model, MoleculeModel
@@ -81,7 +81,9 @@ def load_checkpoint(path: str,
 
     # Load model and args
     if from_package:
-        state = torch.load(resources.open_binary(path, 'model.pt'),
+        #state = torch.load(resources.open_binary(path, 'model.pt'),
+        #                   map_location=lambda storage, loc: storage)
+        state = torch.load(io.BytesIO(pkgutil.get_data('chemprop_solvation', path)),
                            map_location=lambda storage, loc: storage)
     else:
         state = torch.load(path, map_location=lambda storage, loc: storage)
@@ -130,7 +132,9 @@ def load_scalers(path: str, from_package: bool = False) -> Tuple[StandardScaler,
     :return: A tuple with the data scaler and the features scaler.
     """
     if from_package:
-        state = torch.load(resources.open_binary(path, 'model.pt'),
+        #state = torch.load(resources.open_binary(path, 'model.pt'),
+        #                   map_location=lambda storage, loc: storage)
+        state = torch.load(io.BytesIO(pkgutil.get_data('chemprop_solvation', path)),
                            map_location=lambda storage, loc: storage)
     else:
         state = torch.load(path, map_location=lambda storage, loc: storage)
@@ -153,7 +157,9 @@ def load_args(path: str, from_package: bool = False) -> Namespace:
     :return: The arguments Namespace that the model was trained with.
     """
     if from_package:
-        return torch.load(resources.open_binary(path, 'model.pt'),
+        #return torch.load(resources.open_binary(path, 'model.pt'),
+        #                   map_location=lambda storage, loc: storage)['args']
+       return torch.load(io.BytesIO(pkgutil.get_data('chemprop_solvation', path)),
                            map_location=lambda storage, loc: storage)['args']
     else:
         return torch.load(path, map_location=lambda storage, loc: storage)['args']
