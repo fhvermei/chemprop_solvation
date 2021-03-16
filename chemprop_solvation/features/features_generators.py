@@ -34,8 +34,13 @@ def get_features_generator(features_generator_name: str) -> FeaturesGenerator:
     :return: The desired FeaturesGenerator.
     """
     if features_generator_name not in FEATURES_GENERATOR_REGISTRY:
-        raise ValueError(f'Features generator "{features_generator_name}" could not be found. '
-                         f'If this generator relies on rdkit features, you may need to install descriptastorus.')
+        raise ValueError(f'Features generator "{features_generator_name}" could not be found.\n'
+                         f'If this generator relies on rdkit features, or if you are trying to use the SoluteML model, '
+                         f'you need to install descriptastorus.\n'
+                         f'Run the following line to install descriptastorus:\n'
+                         f'\tpip install git+https://github.com/bp-kelley/descriptastorus\n'
+                         f'Or to install with conda run, use the following line:\n'
+                         f'\tconda install -c rmg descriptastorus')
 
     return FEATURES_GENERATOR_REGISTRY[features_generator_name]
 
