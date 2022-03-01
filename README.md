@@ -1,17 +1,20 @@
-From https://github.com/chemprop/chemprop
+Based on https://github.com/chemprop/chemprop
 
 # Property Prediction
-This repository contains message passing neural networks for molecular property prediction.
+This repository contains message passing neural networks for Abraham solute parameters (SoluteML), solvation free 
+energy and solvation enthalpy (DirectML) prediction.
 
 ## Table of Contents
 
 - [Requirements](#requirements)
 - [Installation](#installation)
   * [Option 1: Conda](#option-1-conda)
-  * [Option 2: Docker](#option-2-docker)
-  * [(Optional) Installing `chemprop` as a Package](#optional-installing-chemprop-as-a-package)
+  * [Option 2: Installing from source](#option-2-installing-from-source)
   * [Notes](#notes)
+- [Sample Code](#sample-code)
 - [Web Interface](#web-interface)
+- [How to Cite](#how-to-cite)
+- [License Information](#license-information)
 - [Data](#data)
 - [Training](#training)
   * [Train/Validation/Test Splits](#train-validation-test-splits)
@@ -24,6 +27,7 @@ This repository contains message passing neural networks for molecular property 
 - [Predicting](#predicting)
 - [TensorBoard](#tensorboard)
 - [Results](#results)
+- [Adjustments for solvation / dual molecular representation](#adjustments-for-solvation--dual-molecular-representation)
 
 ## Requirements
 
@@ -31,58 +35,70 @@ While it is possible to run all of the code on a CPU-only machine, GPUs make tra
  * cuda >= 8.0
  * cuDNN
 
+Chemprop_solvation supports Windows, Mac, and Linux OS.
+
 ## Installation
+
+Chemprop_solvation can be installed either via conda or from source (i.e., directly from this git repo).
+
+**Both options require conda, so first install Miniconda from [https://conda.io/miniconda.html](https://conda.io/miniconda.html).**
+
+Follow the instruction by typing the shaded code block on a command prompt / terminal.
 
 ### Option 1: Conda
 
-The easiest way to install the `chemprop` dependencies is via conda. Here are the steps:
+The easiest way to install the `chemprop_solvation` dependencies is to install as a conda package. Here are the steps
+to follow on the command line:
 
-1. Install Miniconda from [https://conda.io/miniconda.html](https://conda.io/miniconda.html)
-2. `cd /path/to/chemprop`
-3. `conda env create -f environment.yml`
-4. `source activate chemprop` (or `conda activate chemprop` for newer versions of conda)
-5. (Optional) `pip install git+https://github.com/bp-kelley/descriptastorus`
+1. `conda create -n chemprop_solvation` (create a new conda environment)
+2. `conda activate chemprop_solvation` (activate the conda environment)
+3. `conda install -c fhvermei -c conda-forge chemprop_solvation` (install the package)
+4. `conda install -c anaconda git`  (install git if it is not installed)
+5. `pip install git+https://github.com/bp-kelley/descriptastorus` (install a required dependency)
 
-The optional `descriptastorus` package is only necessary if you plan to incorporate computed RDKit features into your model (see [Additional Features](#additional-features)). The addition of these features improves model performance on some datasets but is not necessary for the base model.
+### Option 2: Installing from source
 
-### Option 2: Docker
+1. `conda install -c anaconda git`  (install git if it is not installed)
+2. `git clone https://github.com/fhvermei/chemprop_solvation.git`  (clone a repository)
+3. `cd chemprop_solvation` (go to a directory to which the git repository is cloned)
+4. `conda env create -f environment.yml` (create a new conda environment)
+5. `conda activate chemprop_solvation` (activate the conda environment)
+6. `pip install git+https://github.com/bp-kelley/descriptastorus` (install a required dependency)
+7. `pip install -e .` (install the chemprop_solvation project in editable mode)
+8. Download the machine learning model files ("ML_model_files.zip") from [here](https://zenodo.org/record/5792296) and extract it.
+9. Copy the "SoluteML", "DirectML_Gsolv", and "DirectML_Hsolv" folders from the extracted "ML_model_files" folder and place them under `chemprop_solvation/chemprop_solvation/final_models/`.
 
-Docker provides a nice way to isolate the `chemprop` code and environment. To install and run our code in a Docker container, follow these steps:
-
-1. Install Docker from [https://docs.docker.com/install/](https://docs.docker.com/install/)
-2. `cd /path/to/chemprop`
-3. `docker build -t chemprop .`
-4. `docker run -it chemprop:latest /bin/bash`
-
-Note that you will need to run the latter command with nvidia-docker if you are on a GPU machine in order to be able to access the GPUs. 
-
-### (Optional) Installing `chemprop` as a Package
-
-If you would like to use functions or classes from `chemprop` in your own code, you can install `chemprop` as a pip package as follows:
-
-1. `cd /path/to/chemprop`
-2. `pip install .`
-
-Then you can use `import chemprop` or `from chemprop import ...` in your other code.
 
 ### Notes
 
 If you get warning messages about `kyotocabinet` not being installed, it's safe to ignore them.
-   
+
+
+## Sample Code
+
+Sample python code is located at `chemprop_solvation/examples/sample_ML_estimator_calc.py`.
+
+Sample jupyter notebook is also available at `chemprop_solvation/examples/sample_jupyter_notebook_ML_estimator_calc.ipynb`.
+To open the jupyter notebook:
+1. `conda activate chemprop_solvation` (activate the conda environment)
+2. `pip install notebook` (install a jupyter notebook)
+3. `jupyter notebook` (jupyter notebook interface will appear in a new browser window )
+
 ## Web Interface
+A user-friendly online webtool is available on [here](https://rmg.mit.edu/database/solvation/search/).
 
-For those less familiar with the command line, we also have a web interface which allows for basic training and predicting. After installing the dependencies following the instructions above, you can start the web interface in two ways:
+## How to Cite
+If you use this software for research, please cite our work as follows:
 
-1. Run `python web/run.py` and then navigate to [localhost:5000](http://localhost:5000) in a web browser. This will start the site in development mode.
-2. Run `gunicorn --bind {host}:{port} 'wsgi:build_app()'`. This will start the site in production mode.
-   * To run this server in the background, add the `--daemon` flag.
-   * Arguments including `init_db` and `demo` can be passed with this pattern: `'wsgi:build_app(init_db=True, demo=True)'` 
-   * Gunicorn documentation can be found [here](http://docs.gunicorn.org/en/stable/index.html).
+Chung, Y.; Vermeire, F. H.; Wu, H.; Walker, P. J.; Abraham, M. H.; Green, W. H. Group contribution and
+machine learning approaches to predict Abraham solute parameters, solvation free energy, and solvation enthalpy.
+<i>J. Chem. Inf. Model.</i> 2022. 62, 3, 433-446. doi: 10.1021/acs.jcim.1c01103. [Link](https://pubs.acs.org/doi/10.1021/acs.jcim.1c01103)
 
-![Training with our web interface](web/app/static/images/web_train.png "Training with our web interface")
+The preprint of our manuscript is also available at [10.33774/chemrxiv-2021-djd3d-v2](https://chemrxiv.org/engage/chemrxiv/article-details/613b96efac321950af77ae13)
 
-![Predicting with our web interface](web/app/static/images/web_predict.png "Predicting with our web interface")
-
+## License Information
+Chemprop_solvation is a free, open-source software package distributed under the 
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode).
 
 ## Data
 
