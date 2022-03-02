@@ -3,8 +3,11 @@
 *.DS_Store
 *.vscode
 *.csv
-*.pt
 *.json
 *.sqlite3
 ./data
 ./examples
+.Rhistory
+chemprop_solvation.egg-info
+final_models/
+.ipynb_checkpoints
